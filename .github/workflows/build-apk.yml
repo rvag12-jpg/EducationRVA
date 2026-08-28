@@ -39,7 +39,7 @@ jobs:
         run: |
           mkdir -p app/src/main/assets/www/static
           cat chunks/appgz.00 chunks/appgz.01 | base64 -d | gunzip > app/src/main/assets/www/static/app.js
-          cat exact/local.00 exact/local.01a exact/local.01b | base64 -d | gunzip > app/src/main/assets/www/static/local-api.js
+          cat exact/local.00 | base64 -d | gunzip > app/src/main/assets/www/static/local-api.js
           echo "a91d1cf2ccc563fc701aef1de92165fcbd1a7723a17e9ff45e89ae8c29e23cc4  app/src/main/assets/www/static/app.js" | sha256sum -c -
           echo "657c94723c51d43680bbb5ae6e3a87c37b9e9a8fe2ab573e93ea6bddf61da3c3  app/src/main/assets/www/static/local-api.js" | sha256sum -c -
           node --check app/src/main/assets/www/static/app.js
