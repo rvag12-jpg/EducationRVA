@@ -44,7 +44,6 @@ jobs:
           echo "657c94723c51d43680bbb5ae6e3a87c37b9e9a8fe2ab573e93ea6bddf61da3c3  app/src/main/assets/www/static/local-api.js" | sha256sum -c -
           node --check app/src/main/assets/www/static/app.js
           node --check app/src/main/assets/www/static/local-api.js
-          wc -c app/src/main/assets/www/static/app.js app/src/main/assets/www/static/local-api.js
 
       - name: Build debug APK
         shell: bash
@@ -52,24 +51,37 @@ jobs:
           set -o pipefail
           gradle :app:assembleDebug --stacktrace --info --console=plain 2>&1 | tee gradle-build.log
 
-      - name: Upload Gradle build log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: gradle-build-log
-          path: gradle-build.log
-          if-no-files-found: warn
+      - name: Verify APK signature and manifest
+        shell: bash
+        run: |
+          APK=app/build/outputs/apk/debug/app-debug.apk
+          test -s "$APK"
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$APK" | tee apk-signature.txt
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$APK" | tee apk-badging.txt
+          grep -q "package: name='es.aulaevidencia.personal.v123'" apk-badging.txt
+          grep -q "sdkVersion:'26'" apk-badging.txt
 
       - name: Prepare APK artifact
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk AulaEvidencia-Personal-1.2.0-debug.apk
-          sha256sum AulaEvidencia-Personal-1.2.0-debug.apk > AulaEvidencia-Personal-1.2.0-debug.apk.sha256
+          cp app/build/outputs/apk/debug/app-debug.apk AulaEvidencia-Personal-1.2.3-install.apk
+          sha256sum AulaEvidencia-Personal-1.2.3-install.apk > AulaEvidencia-Personal-1.2.3-install.apk.sha256
+
+      - name: Upload diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: AulaEvidencia-build-diagnostics
+          path: |
+            gradle-build.log
+            apk-signature.txt
+            apk-badging.txt
+          if-no-files-found: warn
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: AulaEvidencia-Personal-APK
+          name: AulaEvidencia-Personal-APK-1.2.3
           path: |
-            AulaEvidencia-Personal-1.2.0-debug.apk
-            AulaEvidencia-Personal-1.2.0-debug.apk.sha256
+            AulaEvidencia-Personal-1.2.3-install.apk
+            AulaEvidencia-Personal-1.2.3-install.apk.sha256
           if-no-files-found: error
