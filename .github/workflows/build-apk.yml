@@ -58,13 +58,15 @@ jobs:
           test -s "$APK"
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$APK" | tee apk-signature.txt
           "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$APK" | tee apk-badging.txt
-          grep -q "package: name='es.aulaevidencia.personal.v123'" apk-badging.txt
+          grep -q "package: name='es.aulaevidencia.personal.v124'" apk-badging.txt
+          grep -q "versionName='1.2.4-personal'" apk-badging.txt
           grep -q "sdkVersion:'26'" apk-badging.txt
+          grep -q "Verified using v2 scheme (APK Signature Scheme v2): true" apk-signature.txt
 
       - name: Prepare APK artifact
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk AulaEvidencia-Personal-1.2.3-install.apk
-          sha256sum AulaEvidencia-Personal-1.2.3-install.apk > AulaEvidencia-Personal-1.2.3-install.apk.sha256
+          cp app/build/outputs/apk/debug/app-debug.apk AulaEvidencia-Personal-1.2.4-secure-storage-fix.apk
+          sha256sum AulaEvidencia-Personal-1.2.4-secure-storage-fix.apk > AulaEvidencia-Personal-1.2.4-secure-storage-fix.apk.sha256
 
       - name: Upload diagnostics
         if: always()
@@ -80,8 +82,8 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: AulaEvidencia-Personal-APK-1.2.3
+          name: AulaEvidencia-Personal-APK-1.2.4
           path: |
-            AulaEvidencia-Personal-1.2.3-install.apk
-            AulaEvidencia-Personal-1.2.3-install.apk.sha256
+            AulaEvidencia-Personal-1.2.4-secure-storage-fix.apk
+            AulaEvidencia-Personal-1.2.4-secure-storage-fix.apk.sha256
           if-no-files-found: error
