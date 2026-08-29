@@ -43,7 +43,7 @@ public class MainActivity extends FragmentActivity {
     private static final String HOME_URL = "file:///android_asset/www/index.html";
     private WebView webView;
     private SecurityManager security;
-    private boolean unlocked = false;
+    private volatile boolean unlocked = false;
     private boolean authDialogVisible = false;
     private boolean webInitialized = false;
     private long backgroundAt = 0L;
