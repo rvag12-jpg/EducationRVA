@@ -46,8 +46,13 @@ jobs:
           node --check app/src/main/assets/www/static/local-api.js
           node --check app/src/main/assets/www/static/delete-feature.js
           node --check app/src/main/assets/www/static/cumulative-grade.js
+          node --check app/src/main/assets/www/static/resizable-columns.js
+          node --check app/src/main/assets/www/static/assessment-colors.js
           grep -q 'static/delete-feature.js' app/src/main/assets/www/index.html
           grep -q 'static/cumulative-grade.js' app/src/main/assets/www/index.html
+          grep -q 'static/resizable-columns.js' app/src/main/assets/www/index.html
+          grep -q 'static/assessment-colors.js' app/src/main/assets/www/index.html
+          grep -q '1024 colores' app/src/main/assets/www/static/assessment-colors.js
 
       - name: Build debug APK
         shell: bash
@@ -62,23 +67,25 @@ jobs:
           test -s "$APK"
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$APK" | tee apk-signature.txt
           "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$APK" | tee apk-badging.txt
-          grep -q "package: name='es.aulaevidencia.personal.v126'" apk-badging.txt
-          grep -q "versionName='1.2.6-personal'" apk-badging.txt
+          grep -q "package: name='es.aulaevidencia.personal.v127'" apk-badging.txt
+          grep -q "versionName='1.2.7-personal'" apk-badging.txt
           grep -q "sdkVersion:'26'" apk-badging.txt
           grep -q "Verified using v2 scheme (APK Signature Scheme v2): true" apk-signature.txt
           unzip -l "$APK" | grep -q 'assets/www/static/delete-feature.js'
           unzip -l "$APK" | grep -q 'assets/www/static/cumulative-grade.js'
+          unzip -l "$APK" | grep -q 'assets/www/static/resizable-columns.js'
+          unzip -l "$APK" | grep -q 'assets/www/static/assessment-colors.js'
 
       - name: Prepare APK artifact
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk AulaEvidencia-Personal-1.2.6-notas-acumulativas.apk
-          sha256sum AulaEvidencia-Personal-1.2.6-notas-acumulativas.apk > AulaEvidencia-Personal-1.2.6-notas-acumulativas.apk.sha256
+          cp app/build/outputs/apk/debug/app-debug.apk AulaEvidencia-Personal-1.2.7-columnas-colores.apk
+          sha256sum AulaEvidencia-Personal-1.2.7-columnas-colores.apk > AulaEvidencia-Personal-1.2.7-columnas-colores.apk.sha256
 
       - name: Upload diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: AulaEvidencia-build-diagnostics-1.2.6
+          name: AulaEvidencia-build-diagnostics-1.2.7
           path: |
             gradle-build.log
             apk-signature.txt
@@ -88,8 +95,8 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: AulaEvidencia-Personal-APK-1.2.6
+          name: AulaEvidencia-Personal-APK-1.2.7
           path: |
-            AulaEvidencia-Personal-1.2.6-notas-acumulativas.apk
-            AulaEvidencia-Personal-1.2.6-notas-acumulativas.apk.sha256
+            AulaEvidencia-Personal-1.2.7-columnas-colores.apk
+            AulaEvidencia-Personal-1.2.7-columnas-colores.apk.sha256
           if-no-files-found: error
