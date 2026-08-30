@@ -21,6 +21,33 @@ jobs:
           distribution: temurin
           java-version: '17'
 
+      - name: Restore persistent Android debug signing key
+        id: signing-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: aulaevidencia-stable-debug-keystore-v1
+
+      - name: Create signing key on first stable build
+        if: steps.signing-cache.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          mkdir -p ~/.android
+          keytool -genkeypair -v \
+            -keystore ~/.android/debug.keystore \
+            -storepass android \
+            -alias androiddebugkey \
+            -keypass android \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=AulaEvidencia Stable Debug,O=AulaEvidencia,C=ES"
+
+      - name: Signing key fingerprint
+        shell: bash
+        run: |
+          keytool -list -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey | tee signing-key.txt
+
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
@@ -67,8 +94,8 @@ jobs:
           test -s "$APK"
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$APK" | tee apk-signature.txt
           "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$APK" | tee apk-badging.txt
-          grep -q "package: name='es.aulaevidencia.personal.v127'" apk-badging.txt
-          grep -q "versionName='1.2.7-personal'" apk-badging.txt
+          grep -q "package: name='es.aulaevidencia.personal.stable'" apk-badging.txt
+          grep -q "versionName='1.2.8-personal'" apk-badging.txt
           grep -q "sdkVersion:'26'" apk-badging.txt
           grep -q "Verified using v2 scheme (APK Signature Scheme v2): true" apk-signature.txt
           unzip -l "$APK" | grep -q 'assets/www/static/delete-feature.js'
@@ -78,25 +105,26 @@ jobs:
 
       - name: Prepare APK artifact
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk AulaEvidencia-Personal-1.2.7-columnas-colores.apk
-          sha256sum AulaEvidencia-Personal-1.2.7-columnas-colores.apk > AulaEvidencia-Personal-1.2.7-columnas-colores.apk.sha256
+          cp app/build/outputs/apk/debug/app-debug.apk AulaEvidencia-Personal-1.2.8-estable.apk
+          sha256sum AulaEvidencia-Personal-1.2.8-estable.apk > AulaEvidencia-Personal-1.2.8-estable.apk.sha256
 
       - name: Upload diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: AulaEvidencia-build-diagnostics-1.2.7
+          name: AulaEvidencia-build-diagnostics-1.2.8
           path: |
             gradle-build.log
             apk-signature.txt
             apk-badging.txt
+            signing-key.txt
           if-no-files-found: warn
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: AulaEvidencia-Personal-APK-1.2.7
+          name: AulaEvidencia-Personal-APK-1.2.8
           path: |
-            AulaEvidencia-Personal-1.2.7-columnas-colores.apk
-            AulaEvidencia-Personal-1.2.7-columnas-colores.apk.sha256
+            AulaEvidencia-Personal-1.2.8-estable.apk
+            AulaEvidencia-Personal-1.2.8-estable.apk.sha256
           if-no-files-found: error
