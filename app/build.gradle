@@ -7,11 +7,11 @@ android {
     compileSdk 36
 
     defaultConfig {
-        applicationId 'es.aulaevidencia.personal.v125'
+        applicationId 'es.aulaevidencia.personal.v126'
         minSdk 26
         targetSdk 36
-        versionCode 8
-        versionName '1.2.5-personal'
+        versionCode 9
+        versionName '1.2.6-personal'
     }
 
     buildTypes {
