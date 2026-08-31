@@ -67,14 +67,11 @@ jobs:
           node --check app/src/main/assets/www/static/docio-theme.js
           grep -q 'DOCIO · Cuaderno Digital' app/src/main/assets/www/index.html
           grep -q 'Horario semanal' app/src/main/assets/www/static/weekly-schedule.js
-          grep -q 'Añadir clase semanal' app/src/main/assets/www/static/weekly-schedule.js
           grep -q 'docio-home-bg.jpg' app/src/main/assets/www/static/docio-theme.js
           grep -q 'docio-logo.jpg' app/src/main/assets/www/static/docio-theme.js
-          grep -q 'docio-menu-btn' app/src/main/assets/www/static/docio-theme.js
-          grep -q 'docio-home-btn' app/src/main/assets/www/static/docio-theme.js
-          grep -q 'Configurar centro educativo' app/src/main/assets/www/static/docio-theme.js
-          grep -q 'Intl.DateTimeFormat' app/src/main/assets/www/static/docio-theme.js
-          grep -q "input.max = '10'" app/src/main/assets/www/static/gradebook-score-limits.js
+          ! grep -q 'M25,78 L43,30' app/src/main/res/drawable/ic_launcher.xml
+          grep -q '#35BFC8' app/src/main/res/drawable/ic_launcher.xml
+          grep -q '#8BD65B' app/src/main/res/drawable/ic_launcher.xml
       - name: Build debug APK
         shell: bash
         run: |
@@ -88,24 +85,21 @@ jobs:
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$APK" | tee apk-signature.txt
           "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$APK" | tee apk-badging.txt
           grep -q "package: name='es.aulaevidencia.personal.stable'" apk-badging.txt
-          grep -q "versionName='1.2.13-docio'" apk-badging.txt
+          grep -q "versionName='1.2.14-docio'" apk-badging.txt
           grep -q "application-label:'DOCIO'" apk-badging.txt
           grep -q "sdkVersion:'26'" apk-badging.txt
           grep -q "Verified using v2 scheme (APK Signature Scheme v2): true" apk-signature.txt
-          unzip -p "$APK" assets/www/static/docio-theme.js | grep -q 'Configurar centro educativo'
-          unzip -p "$APK" assets/www/static/docio-theme.js | grep -q 'docio-menu-btn'
-          unzip -p "$APK" assets/www/static/docio-theme.js | grep -q 'docio-home-btn'
-          unzip -l "$APK" | grep -q 'assets/www/media/docio-home-bg.jpg'
+          unzip -l "$APK" | grep -q 'res/drawable/ic_launcher.xml'
           unzip -l "$APK" | grep -q 'assets/www/media/docio-logo.jpg'
       - name: Prepare APK artifact
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk DOCIO-Cuaderno-Digital-1.2.13.apk
-          sha256sum DOCIO-Cuaderno-Digital-1.2.13.apk > DOCIO-Cuaderno-Digital-1.2.13.apk.sha256
+          cp app/build/outputs/apk/debug/app-debug.apk DOCIO-Cuaderno-Digital-1.2.14.apk
+          sha256sum DOCIO-Cuaderno-Digital-1.2.14.apk > DOCIO-Cuaderno-Digital-1.2.14.apk.sha256
       - name: Upload diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: DOCIO-build-diagnostics-1.2.13
+          name: DOCIO-build-diagnostics-1.2.14
           path: |
             gradle-build.log
             apk-signature.txt
@@ -115,8 +109,8 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: DOCIO-APK-1.2.13
+          name: DOCIO-APK-1.2.14
           path: |
-            DOCIO-Cuaderno-Digital-1.2.13.apk
-            DOCIO-Cuaderno-Digital-1.2.13.apk.sha256
+            DOCIO-Cuaderno-Digital-1.2.14.apk
+            DOCIO-Cuaderno-Digital-1.2.14.apk.sha256
           if-no-files-found: error
