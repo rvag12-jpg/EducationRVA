@@ -40,7 +40,7 @@ jobs:
           grep -q 'assessment_item_id' app/src/main/assets/www/static/period-cumulative-criteria.js
       - name: Build debug APK
         run: gradle :app:assembleDebug --stacktrace --console=plain 2>&1 | tee gradle-build.log
-      - name: Verify APK and explicit signer
+      - name: Verify APK and signer
         run: |
           APK=app/build/outputs/apk/debug/app-debug.apk
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$APK" | tee apk-signature.txt
@@ -48,7 +48,7 @@ jobs:
           grep -q "package: name='es.aulaevidencia.personal.stable'" apk-badging.txt
           grep -q "versionName='1.2.23-docio'" apk-badging.txt
           grep -q "application-label:'DOCIO'" apk-badging.txt
-          grep -q 'Signer #1 certificate DN: C=ES, O=AulaEvidencia, CN=AulaEvidencia Stable Debug' apk-signature.txt
+          grep -q 'Signer #1 certificate SHA-256 digest: e33e997d020d3577852cfb06495e8f018fa8792fa1c86f1fd7935c941a1e31c3' apk-signature.txt
           unzip -p "$APK" assets/www/static/period-cumulative-criteria.js | grep -q '__CRITERION_MEAN__'
       - name: Prepare APK artifact
         run: |
