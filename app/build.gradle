@@ -10,8 +10,8 @@ android {
         applicationId 'es.aulaevidencia.personal.stable'
         minSdk 26
         targetSdk 36
-        versionCode 21
-        versionName '1.2.18-docio'
+        versionCode 22
+        versionName '1.2.19-docio'
     }
 
     buildTypes {
