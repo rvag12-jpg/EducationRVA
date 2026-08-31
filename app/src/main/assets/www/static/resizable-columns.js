@@ -1,157 +1,17 @@
 'use strict';
 (() => {
-  const STORAGE_KEY='aulaevidencia_gradebook_column_widths_v1';
-  const MIN=54, MAX=520;
-  let widths={};
-  let resizeMode=false;
-  try { widths=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}')||{}; } catch(_){ widths={}; }
-
-  function isGradebookTable(table){
-    const context=(table.closest('section,main,div')?.innerText||table.innerText||'').toLowerCase();
-    return context.includes('cuaderno') && !!table.querySelector('input[type="number"]');
-  }
-
-  function tableKey(table){
-    const headers=[...table.querySelectorAll('thead th')].map(th=>(th.innerText||'').trim()).join('|');
-    return 't:'+headers.slice(0,400);
-  }
-
-  function save(){
-    try { localStorage.setItem(STORAGE_KEY,JSON.stringify(widths)); } catch(_){}
-  }
-
-  function applyWidth(table,index,width){
-    const px=Math.max(MIN,Math.min(MAX,Math.round(width)));
-    table.querySelectorAll('tr').forEach(row=>{
-      const cell=row.children[index];
-      if(cell){
-        cell.style.width=px+'px';
-        cell.style.minWidth=px+'px';
-        cell.style.maxWidth=px+'px';
-      }
-    });
-  }
-
-  function updateButton(){
-    const btn=document.getElementById('ae-resize-columns-toggle');
-    const hasGradebook=[...document.querySelectorAll('table')].some(isGradebookTable);
-    if(btn) {
-      btn.hidden=!hasGradebook;
-      btn.textContent=resizeMode?'Finalizar ajuste':'Ajustar columnas';
-      btn.setAttribute('aria-pressed',resizeMode?'true':'false');
-      btn.title=resizeMode?'Desactiva el ajuste de columnas':'Activa los tiradores para modificar el ancho de las columnas';
-    }
-    document.body.classList.toggle('ae-resize-mode',resizeMode && hasGradebook);
-    if(!hasGradebook && resizeMode) resizeMode=false;
-  }
-
-  function ensureToggleButton(){
-    let btn=document.getElementById('ae-resize-columns-toggle');
-    if(btn) return btn;
-    btn=document.createElement('button');
-    btn.id='ae-resize-columns-toggle';
-    btn.type='button';
-    btn.className='ae-resize-toggle';
-    btn.hidden=true;
-    btn.textContent='Ajustar columnas';
-    btn.setAttribute('aria-pressed','false');
-    btn.addEventListener('click',()=>{
-      resizeMode=!resizeMode;
-      updateButton();
-    });
-    document.body.appendChild(btn);
-    return btn;
-  }
-
-  function enhance(table){
-    if(table.dataset.aeResizable==='1' || !isGradebookTable(table)) return;
-    const headers=[...table.querySelectorAll('thead th')];
-    if(!headers.length) return;
-    table.dataset.aeResizable='1';
-    table.style.tableLayout='fixed';
-    const key=tableKey(table);
-
-    headers.forEach((th,index)=>{
-      th.style.position='relative';
-      const saved=widths[key]?.[index];
-      if(saved) applyWidth(table,index,saved);
-
-      const handle=document.createElement('button');
-      handle.type='button';
-      handle.className='ae-col-resizer';
-      handle.title='Arrastra para cambiar el ancho de esta columna';
-      handle.setAttribute('aria-label','Cambiar ancho de columna');
-      th.appendChild(handle);
-
-      let startX=0,startW=0;
-      const move=e=>{
-        if(!resizeMode) return;
-        if(e.cancelable) e.preventDefault();
-        const x=e.touches?.[0]?.clientX ?? e.clientX;
-        applyWidth(table,index,startW+(x-startX));
-      };
-      const end=()=>{
-        document.removeEventListener('mousemove',move);
-        document.removeEventListener('mouseup',end);
-        document.removeEventListener('touchmove',move);
-        document.removeEventListener('touchend',end);
-        if(resizeMode){
-          const w=Math.round(th.getBoundingClientRect().width);
-          widths[key]??={};
-          widths[key][index]=w;
-          save();
-        }
-        document.body.classList.remove('ae-resizing');
-      };
-      const start=e=>{
-        if(!resizeMode) return;
-        e.preventDefault();
-        e.stopPropagation();
-        startX=e.touches?.[0]?.clientX ?? e.clientX;
-        startW=th.getBoundingClientRect().width;
-        document.body.classList.add('ae-resizing');
-        document.addEventListener('mousemove',move);
-        document.addEventListener('mouseup',end);
-        document.addEventListener('touchmove',move,{passive:false});
-        document.addEventListener('touchend',end);
-      };
-
-      handle.addEventListener('mousedown',start);
-      handle.addEventListener('touchstart',start,{passive:false});
-      handle.addEventListener('dblclick',e=>{
-        if(!resizeMode) return;
-        e.preventDefault();
-        e.stopPropagation();
-        table.querySelectorAll('tr').forEach(row=>{
-          const c=row.children[index];
-          if(c){ c.style.width=''; c.style.minWidth=''; c.style.maxWidth=''; }
-        });
-        if(widths[key]){
-          delete widths[key][index];
-          save();
-        }
-      });
-    });
-  }
-
-  function scan(){
-    ensureToggleButton();
-    document.querySelectorAll('table').forEach(enhance);
-    updateButton();
-  }
-
-  const style=document.createElement('style');
-  style.textContent=`
-    .ae-resize-toggle{position:fixed;right:16px;bottom:82px;z-index:80;padding:10px 14px;border-radius:999px;border:1px solid rgba(0,0,0,.2);background:#fff;box-shadow:0 3px 12px rgba(0,0,0,.18);font-weight:600;cursor:pointer}
-    .ae-resize-toggle[aria-pressed="true"]{outline:3px solid rgba(23,59,103,.2)}
-    .ae-col-resizer{display:none;position:absolute;top:50%;right:-10px;transform:translateY(-50%);width:24px;height:34px;padding:0;border:1px solid currentColor;border-radius:8px;background:rgba(255,255,255,.92);cursor:col-resize;touch-action:none;z-index:12}
-    .ae-col-resizer::before{content:'⋮';font-size:22px;line-height:28px;display:block}
-    body.ae-resize-mode .ae-col-resizer{display:block}
-    body.ae-resize-mode table[data-ae-resizable="1"] thead th{outline:1px dashed rgba(23,59,103,.28)}
-    body.ae-resizing{user-select:none;cursor:col-resize}
-    body.ae-resizing *{cursor:col-resize!important}
-  `;
-  document.head.appendChild(style);
-  new MutationObserver(scan).observe(document.getElementById('app')||document.body,{childList:true,subtree:true});
-  scan();
+  const STORAGE_KEY='docio_gradebook_column_widths_v2',MIN=54,MAX=520;
+  let widths={},resizeMode=false;
+  try{widths=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}')||{}}catch(_){widths={}}
+  const save=()=>{try{localStorage.setItem(STORAGE_KEY,JSON.stringify(widths))}catch(_){}};
+  function isGradebookTable(t){return !!t.querySelector('input[type="number"]')&&((t.closest('#app')?.innerText||'').toLowerCase().includes('cuaderno'))}
+  function groupKey(){try{return 'g:'+(window.state?.groupId||'global')+':'}catch(_){return 'g:global:'}}
+  function tableKey(t){const h=[...t.querySelectorAll('thead th')].map(x=>(x.innerText||'').replace(/⋮/g,'').trim()).join('|');return groupKey()+h.slice(0,500)}
+  function apply(t,i,w){const px=Math.max(MIN,Math.min(MAX,Math.round(w)));t.querySelectorAll('tr').forEach(r=>{const c=r.children[i];if(c){c.style.width=px+'px';c.style.minWidth=px+'px';c.style.maxWidth=px+'px'}})}
+  function clearTable(t){const key=tableKey(t);t.querySelectorAll('tr').forEach(r=>[...r.children].forEach(c=>{c.style.width='';c.style.minWidth='';c.style.maxWidth=''}));delete widths[key];save()}
+  function toolbar(){let bar=document.getElementById('docio-column-tools');if(bar)return bar;bar=document.createElement('div');bar.id='docio-column-tools';bar.innerHTML='<button type="button" id="docio-resize-toggle">Ajustar columnas</button><button type="button" id="docio-resize-reset">Restablecer anchos</button>';document.body.appendChild(bar);bar.querySelector('#docio-resize-toggle').onclick=()=>{resizeMode=!resizeMode;sync()};bar.querySelector('#docio-resize-reset').onclick=()=>{document.querySelectorAll('table[data-docio-resizable="1"]').forEach(clearTable);sync()};return bar}
+  function sync(){const has=[...document.querySelectorAll('table')].some(isGradebookTable),bar=toolbar(),toggle=bar.querySelector('#docio-resize-toggle');bar.hidden=!has;if(!has)resizeMode=false;toggle.textContent=resizeMode?'Finalizar ajuste':'Ajustar columnas';toggle.setAttribute('aria-pressed',String(resizeMode));bar.querySelector('#docio-resize-reset').hidden=!resizeMode;document.body.classList.toggle('docio-resize-mode',has&&resizeMode)}
+  function enhance(t){if(t.dataset.docioResizable==='1'||!isGradebookTable(t))return;const hs=[...t.querySelectorAll('thead th')];if(!hs.length)return;t.dataset.docioResizable='1';t.style.tableLayout='fixed';const key=tableKey(t);hs.forEach((th,i)=>{th.style.position='relative';const saved=widths[key]?.[i];if(saved)apply(t,i,saved);const h=document.createElement('span');h.className='docio-col-handle';h.setAttribute('role','separator');h.setAttribute('aria-label','Arrastrar para cambiar ancho de columna');h.title='Arrastra para cambiar el ancho';th.appendChild(h);let sx=0,sw=0;const move=e=>{if(!resizeMode)return;if(e.cancelable)e.preventDefault();const x=e.touches?.[0]?.clientX??e.clientX;apply(t,i,sw+x-sx)};const end=()=>{document.removeEventListener('mousemove',move);document.removeEventListener('mouseup',end);document.removeEventListener('touchmove',move);document.removeEventListener('touchend',end);if(resizeMode){widths[key]??={};widths[key][i]=Math.round(th.getBoundingClientRect().width);save()}document.body.classList.remove('docio-resizing')};const start=e=>{if(!resizeMode)return;e.preventDefault();e.stopPropagation();sx=e.touches?.[0]?.clientX??e.clientX;sw=th.getBoundingClientRect().width;document.body.classList.add('docio-resizing');document.addEventListener('mousemove',move);document.addEventListener('mouseup',end);document.addEventListener('touchmove',move,{passive:false});document.addEventListener('touchend',end)};h.addEventListener('mousedown',start);h.addEventListener('touchstart',start,{passive:false})})}
+  function scan(){document.querySelectorAll('table').forEach(enhance);sync()}
+  const s=document.createElement('style');s.textContent=`#docio-column-tools{position:fixed;right:16px;bottom:82px;z-index:85;display:flex;gap:7px;padding:6px;border-radius:12px;background:rgba(255,255,255,.96);box-shadow:0 3px 14px rgba(0,0,0,.2)}#docio-column-tools[hidden]{display:none!important}#docio-column-tools button{padding:9px 12px;border-radius:9px;border:1px solid rgba(0,0,0,.2);background:#fff;font-weight:600}.docio-col-handle{display:none;position:absolute;right:-10px;top:50%;transform:translateY(-50%);width:24px;height:38px;border:1px solid #31506f;border-radius:8px;background:#fff;z-index:15;cursor:col-resize;touch-action:none}.docio-col-handle:before{content:'⋮';font-size:24px;line-height:34px}.docio-resize-mode table[data-docio-resizable="1"] .docio-col-handle{display:block}.docio-resize-mode table[data-docio-resizable="1"] thead th{outline:1px dashed rgba(49,80,111,.4)}.docio-resizing{user-select:none;cursor:col-resize}.docio-resizing *{cursor:col-resize!important}`;document.head.appendChild(s);new MutationObserver(scan).observe(document.getElementById('app')||document.body,{childList:true,subtree:true});scan();
 })();
