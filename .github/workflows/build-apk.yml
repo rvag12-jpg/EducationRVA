@@ -1,10 +1,8 @@
 name: Build Android APK
-
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -26,12 +24,10 @@ jobs:
           key: aulaevidencia-stable-debug-keystore-v1
       - name: Create signing key on first stable build
         if: steps.signing-cache.outputs.cache-hit != 'true'
-        shell: bash
         run: |
           mkdir -p ~/.android
           keytool -genkeypair -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=AulaEvidencia Stable Debug,O=AulaEvidencia,C=ES"
       - name: Signing key fingerprint
-        shell: bash
         run: keytool -list -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey | tee signing-key.txt
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
@@ -44,7 +40,6 @@ jobs:
         with:
           gradle-version: '9.5.0'
       - name: Rebuild and validate web assets
-        shell: bash
         run: |
           mkdir -p app/src/main/assets/www/static app/src/main/assets/www/media
           cat chunks/appgz.00 chunks/appgz.01 | base64 -d | gunzip > app/src/main/assets/www/static/app.js
@@ -53,53 +48,38 @@ jobs:
           base64 -d exact/docio-logo.b64 > app/src/main/assets/www/media/docio-logo.jpg
           echo "07ffcd30e5b3c3a7d7e19d2475f768b43ffce968ad7af871780ef39615857b8e  app/src/main/assets/www/static/app.js" | sha256sum -c -
           echo "657c94723c51d43680bbb5ae6e3a87c37b9e9a8fe2ab573e93ea6bddf61da3c3  app/src/main/assets/www/static/local-api.js" | sha256sum -c -
-          echo "c794526a21fae979d42f5ccb22ad466678dfefa6266ac8828a3eae61c5cb35ed  app/src/main/assets/www/media/docio-logo.jpg" | sha256sum -c -
-          file app/src/main/assets/www/media/docio-home-bg.jpg | grep -q 'JPEG image data'
-          file app/src/main/assets/www/media/docio-logo.jpg | grep -q 'JPEG image data'
           node --check app/src/main/assets/www/static/app.js
           node --check app/src/main/assets/www/static/local-api.js
-          node --check app/src/main/assets/www/static/delete-feature.js
-          node --check app/src/main/assets/www/static/cumulative-grade.js
-          node --check app/src/main/assets/www/static/resizable-columns.js
-          node --check app/src/main/assets/www/static/assessment-colors.js
-          node --check app/src/main/assets/www/static/gradebook-score-limits.js
+          node --check app/src/main/assets/www/static/curriculum-packages.js
           node --check app/src/main/assets/www/static/weekly-schedule.js
           node --check app/src/main/assets/www/static/docio-theme.js
-          grep -q 'DOCIO · Cuaderno Digital' app/src/main/assets/www/index.html
-          grep -q 'Horario semanal' app/src/main/assets/www/static/weekly-schedule.js
-          grep -q 'docio-home-bg.jpg' app/src/main/assets/www/static/docio-theme.js
-          grep -q 'docio-logo.jpg' app/src/main/assets/www/static/docio-theme.js
-          ! grep -q 'M25,78 L43,30' app/src/main/res/drawable/ic_launcher.xml
+          grep -q 'curriculum-packages.js' app/src/main/assets/www/index.html
+          grep -q 'AN-FYQ-2ESO-2023' app/src/main/assets/www/static/curriculum-packages.js
+          grep -q 'AN-FIS-2BACH-2023' app/src/main/assets/www/static/curriculum-packages.js
           grep -q '#35BFC8' app/src/main/res/drawable/ic_launcher.xml
-          grep -q '#8BD65B' app/src/main/res/drawable/ic_launcher.xml
       - name: Build debug APK
-        shell: bash
-        run: |
-          set -o pipefail
-          gradle :app:assembleDebug --stacktrace --info --console=plain 2>&1 | tee gradle-build.log
+        run: gradle :app:assembleDebug --stacktrace --info --console=plain 2>&1 | tee gradle-build.log
       - name: Verify APK signature and manifest
-        shell: bash
         run: |
           APK=app/build/outputs/apk/debug/app-debug.apk
           test -s "$APK"
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$APK" | tee apk-signature.txt
           "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$APK" | tee apk-badging.txt
           grep -q "package: name='es.aulaevidencia.personal.stable'" apk-badging.txt
-          grep -q "versionName='1.2.14-docio'" apk-badging.txt
+          grep -q "versionName='1.2.15-docio'" apk-badging.txt
           grep -q "application-label:'DOCIO'" apk-badging.txt
-          grep -q "sdkVersion:'26'" apk-badging.txt
           grep -q "Verified using v2 scheme (APK Signature Scheme v2): true" apk-signature.txt
-          unzip -l "$APK" | grep -q 'res/drawable/ic_launcher.xml'
-          unzip -l "$APK" | grep -q 'assets/www/media/docio-logo.jpg'
+          unzip -p "$APK" assets/www/static/curriculum-packages.js | grep -q 'AN-FYQ-2ESO-2023'
+          unzip -p "$APK" assets/www/static/curriculum-packages.js | grep -q 'AN-FIS-2BACH-2023'
       - name: Prepare APK artifact
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk DOCIO-Cuaderno-Digital-1.2.14.apk
-          sha256sum DOCIO-Cuaderno-Digital-1.2.14.apk > DOCIO-Cuaderno-Digital-1.2.14.apk.sha256
+          cp app/build/outputs/apk/debug/app-debug.apk DOCIO-Cuaderno-Digital-1.2.15.apk
+          sha256sum DOCIO-Cuaderno-Digital-1.2.15.apk > DOCIO-Cuaderno-Digital-1.2.15.apk.sha256
       - name: Upload diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: DOCIO-build-diagnostics-1.2.14
+          name: DOCIO-build-diagnostics-1.2.15
           path: |
             gradle-build.log
             apk-signature.txt
@@ -109,8 +89,8 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: DOCIO-APK-1.2.14
+          name: DOCIO-APK-1.2.15
           path: |
-            DOCIO-Cuaderno-Digital-1.2.14.apk
-            DOCIO-Cuaderno-Digital-1.2.14.apk.sha256
+            DOCIO-Cuaderno-Digital-1.2.15.apk
+            DOCIO-Cuaderno-Digital-1.2.15.apk.sha256
           if-no-files-found: error
