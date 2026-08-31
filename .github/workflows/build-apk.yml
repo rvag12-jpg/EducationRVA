@@ -55,11 +55,13 @@ jobs:
       - name: Rebuild and validate web assets
         shell: bash
         run: |
-          mkdir -p app/src/main/assets/www/static
+          mkdir -p app/src/main/assets/www/static app/src/main/assets/www/media
           cat chunks/appgz.00 chunks/appgz.01 | base64 -d | gunzip > app/src/main/assets/www/static/app.js
           cat exact/local.00 | base64 -d | gunzip > app/src/main/assets/www/static/local-api.js
-          echo "9298129f1f9fe0b59bb6719a1e1cd726966f659c007171dee25b84596b96beab  app/src/main/assets/www/static/app.js" | sha256sum -c -
+          base64 -d exact/docio-bg.b64 > app/src/main/assets/www/media/docio-home-bg.jpg
+          echo "07ffcd30e5b3c3a7d7e19d2475f768b43ffce968ad7af871780ef39615857b8e  app/src/main/assets/www/static/app.js" | sha256sum -c -
           echo "657c94723c51d43680bbb5ae6e3a87c37b9e9a8fe2ab573e93ea6bddf61da3c3  app/src/main/assets/www/static/local-api.js" | sha256sum -c -
+          echo "048a1e7a0bc0add5d706a345a02a6a4a1c2c8dc1cc0b0004dbb89d3353efc267  app/src/main/assets/www/media/docio-home-bg.jpg" | sha256sum -c -
           node --check app/src/main/assets/www/static/app.js
           node --check app/src/main/assets/www/static/local-api.js
           node --check app/src/main/assets/www/static/delete-feature.js
@@ -68,11 +70,15 @@ jobs:
           node --check app/src/main/assets/www/static/assessment-colors.js
           node --check app/src/main/assets/www/static/gradebook-score-limits.js
           node --check app/src/main/assets/www/static/weekly-schedule.js
-          grep -q 'id="manualScore"' app/src/main/assets/www/static/app.js
+          node --check app/src/main/assets/www/static/docio-theme.js
+          grep -q 'DOCIO' app/src/main/assets/www/static/app.js
+          grep -q 'DOCIO · Cuaderno Digital' app/src/main/assets/www/index.html
           grep -q 'weekly-schedule.js' app/src/main/assets/www/index.html
+          grep -q 'docio-theme.js' app/src/main/assets/www/index.html
           grep -q 'Horario semanal' app/src/main/assets/www/static/weekly-schedule.js
           grep -q 'Añadir clase semanal' app/src/main/assets/www/static/weekly-schedule.js
           grep -q "\['schedule','Horario'\]" app/src/main/assets/www/static/weekly-schedule.js
+          grep -q 'docio-home-bg.jpg' app/src/main/assets/www/static/docio-theme.js
           grep -q "input.max = '10'" app/src/main/assets/www/static/gradebook-score-limits.js
           grep -q "input.step = '0.01'" app/src/main/assets/www/static/gradebook-score-limits.js
 
@@ -90,24 +96,27 @@ jobs:
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$APK" | tee apk-signature.txt
           "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$APK" | tee apk-badging.txt
           grep -q "package: name='es.aulaevidencia.personal.stable'" apk-badging.txt
-          grep -q "versionName='1.2.11-personal'" apk-badging.txt
+          grep -q "versionName='1.2.12-docio'" apk-badging.txt
+          grep -q "application-label:'DOCIO'" apk-badging.txt
           grep -q "sdkVersion:'26'" apk-badging.txt
           grep -q "Verified using v2 scheme (APK Signature Scheme v2): true" apk-signature.txt
-          unzip -p "$APK" assets/www/index.html | grep -q 'weekly-schedule.js'
+          unzip -p "$APK" assets/www/index.html | grep -q 'DOCIO · Cuaderno Digital'
           unzip -p "$APK" assets/www/static/weekly-schedule.js | grep -q 'Horario semanal'
           unzip -p "$APK" assets/www/static/weekly-schedule.js | grep -q 'Añadir clase semanal'
           unzip -p "$APK" assets/www/static/resizable-columns.js | grep -q 'Ajustar columnas'
+          unzip -p "$APK" assets/www/static/docio-theme.js | grep -q 'docio-home-bg.jpg'
+          unzip -l "$APK" | grep -q 'assets/www/media/docio-home-bg.jpg'
 
       - name: Prepare APK artifact
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk AulaEvidencia-Personal-1.2.11-horario.apk
-          sha256sum AulaEvidencia-Personal-1.2.11-horario.apk > AulaEvidencia-Personal-1.2.11-horario.apk.sha256
+          cp app/build/outputs/apk/debug/app-debug.apk DOCIO-Cuaderno-Digital-1.2.12.apk
+          sha256sum DOCIO-Cuaderno-Digital-1.2.12.apk > DOCIO-Cuaderno-Digital-1.2.12.apk.sha256
 
       - name: Upload diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: AulaEvidencia-build-diagnostics-1.2.11
+          name: DOCIO-build-diagnostics-1.2.12
           path: |
             gradle-build.log
             apk-signature.txt
@@ -118,8 +127,8 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: AulaEvidencia-Personal-APK-1.2.11
+          name: DOCIO-APK-1.2.12
           path: |
-            AulaEvidencia-Personal-1.2.11-horario.apk
-            AulaEvidencia-Personal-1.2.11-horario.apk.sha256
+            DOCIO-Cuaderno-Digital-1.2.12.apk
+            DOCIO-Cuaderno-Digital-1.2.12.apk.sha256
           if-no-files-found: error
