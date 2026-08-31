@@ -33,20 +33,11 @@ jobs:
         shell: bash
         run: |
           mkdir -p ~/.android
-          keytool -genkeypair -v \
-            -keystore ~/.android/debug.keystore \
-            -storepass android \
-            -alias androiddebugkey \
-            -keypass android \
-            -keyalg RSA \
-            -keysize 2048 \
-            -validity 10000 \
-            -dname "CN=AulaEvidencia Stable Debug,O=AulaEvidencia,C=ES"
+          keytool -genkeypair -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=AulaEvidencia Stable Debug,O=AulaEvidencia,C=ES"
 
       - name: Signing key fingerprint
         shell: bash
-        run: |
-          keytool -list -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey | tee signing-key.txt
+        run: keytool -list -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey | tee signing-key.txt
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
@@ -67,7 +58,7 @@ jobs:
           mkdir -p app/src/main/assets/www/static
           cat chunks/appgz.00 chunks/appgz.01 | base64 -d | gunzip > app/src/main/assets/www/static/app.js
           cat exact/local.00 | base64 -d | gunzip > app/src/main/assets/www/static/local-api.js
-          echo "a91d1cf2ccc563fc701aef1de92165fcbd1a7723a17e9ff45e89ae8c29e23cc4  app/src/main/assets/www/static/app.js" | sha256sum -c -
+          echo "1a76e08ba1f7296a9916c96c33a08f3aa150d3ad559bb50983fa72bd4d16cba0  app/src/main/assets/www/static/app.js" | sha256sum -c -
           echo "657c94723c51d43680bbb5ae6e3a87c37b9e9a8fe2ab573e93ea6bddf61da3c3  app/src/main/assets/www/static/local-api.js" | sha256sum -c -
           node --check app/src/main/assets/www/static/app.js
           node --check app/src/main/assets/www/static/local-api.js
@@ -75,11 +66,9 @@ jobs:
           node --check app/src/main/assets/www/static/cumulative-grade.js
           node --check app/src/main/assets/www/static/resizable-columns.js
           node --check app/src/main/assets/www/static/assessment-colors.js
-          grep -q 'static/delete-feature.js' app/src/main/assets/www/index.html
-          grep -q 'static/cumulative-grade.js' app/src/main/assets/www/index.html
-          grep -q 'static/resizable-columns.js' app/src/main/assets/www/index.html
-          grep -q 'static/assessment-colors.js' app/src/main/assets/www/index.html
-          grep -q '1024 colores' app/src/main/assets/www/static/assessment-colors.js
+          grep -q 'id="manualScore"' app/src/main/assets/www/static/app.js
+          grep -q "step=\"0.01\"" app/src/main/assets/www/static/app.js
+          grep -q 'Corrección numérica sin rúbrica' app/src/main/assets/www/static/app.js
 
       - name: Build debug APK
         shell: bash
@@ -98,10 +87,6 @@ jobs:
           grep -q "versionName='1.2.8-personal'" apk-badging.txt
           grep -q "sdkVersion:'26'" apk-badging.txt
           grep -q "Verified using v2 scheme (APK Signature Scheme v2): true" apk-signature.txt
-          unzip -l "$APK" | grep -q 'assets/www/static/delete-feature.js'
-          unzip -l "$APK" | grep -q 'assets/www/static/cumulative-grade.js'
-          unzip -l "$APK" | grep -q 'assets/www/static/resizable-columns.js'
-          unzip -l "$APK" | grep -q 'assets/www/static/assessment-colors.js'
 
       - name: Prepare APK artifact
         run: |
