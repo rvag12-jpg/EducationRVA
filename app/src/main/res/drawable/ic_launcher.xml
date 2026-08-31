@@ -1,7 +1,12 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="108dp" android:height="108dp"
-    android:viewportWidth="108" android:viewportHeight="108">
-    <path android:fillColor="#173B67" android:pathData="M0,0h108v108h-108z"/>
-    <path android:fillColor="#FFFFFF" android:pathData="M25,78 L43,30 L52,30 L70,78 L60,78 L56,66 L39,66 L35,78 Z M42,57 L53,57 L47.5,41 Z"/>
-    <path android:fillColor="#DCE8F5" android:pathData="M67,30h22v9h-13v10h12v9h-12v11h14v9h-23z"/>
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path android:fillColor="#F7FBFC" android:pathData="M0,0h108v108h-108z"/>
+    <!-- DOCIO D: rounded turquoise/green body -->
+    <path android:fillColor="#35BFC8" android:pathData="M25,20 L55,20 C75,20 88,33 88,54 C88,75 75,88 55,88 L25,88 Z M39,34 L39,74 L54,74 C66,74 74,67 74,54 C74,41 66,34 54,34 Z"/>
+    <path android:fillColor="#8BD65B" android:pathData="M55,20 C75,20 88,33 88,54 C88,58 87,62 86,65 C79,60 73,57 66,57 C57,57 51,62 43,62 C36,62 30,58 25,54 L25,39 C31,44 36,48 43,48 C51,48 57,43 66,43 C73,43 79,46 85,50 C83,40 76,34 65,32 C62,31 58,31 55,31 Z"/>
+    <!-- White flowing separator, echoing the DOCIO logo -->
+    <path android:fillColor="#FFFFFF" android:pathData="M25,48 C31,53 36,57 43,57 C51,57 57,52 66,52 C74,52 80,56 87,61 L87,69 C80,64 74,60 66,60 C57,60 51,65 43,65 C36,65 30,61 25,57 Z"/>
 </vector>
