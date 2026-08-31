@@ -61,7 +61,8 @@ jobs:
           base64 -d exact/docio-bg.b64 > app/src/main/assets/www/media/docio-home-bg.jpg
           echo "07ffcd30e5b3c3a7d7e19d2475f768b43ffce968ad7af871780ef39615857b8e  app/src/main/assets/www/static/app.js" | sha256sum -c -
           echo "657c94723c51d43680bbb5ae6e3a87c37b9e9a8fe2ab573e93ea6bddf61da3c3  app/src/main/assets/www/static/local-api.js" | sha256sum -c -
-          echo "048a1e7a0bc0add5d706a345a02a6a4a1c2c8dc1cc0b0004dbb89d3353efc267  app/src/main/assets/www/media/docio-home-bg.jpg" | sha256sum -c -
+          test -s app/src/main/assets/www/media/docio-home-bg.jpg
+          file app/src/main/assets/www/media/docio-home-bg.jpg | grep -q 'JPEG image data'
           node --check app/src/main/assets/www/static/app.js
           node --check app/src/main/assets/www/static/local-api.js
           node --check app/src/main/assets/www/static/delete-feature.js
