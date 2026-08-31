@@ -58,7 +58,7 @@ jobs:
           mkdir -p app/src/main/assets/www/static
           cat chunks/appgz.00 chunks/appgz.01 | base64 -d | gunzip > app/src/main/assets/www/static/app.js
           cat exact/local.00 | base64 -d | gunzip > app/src/main/assets/www/static/local-api.js
-          echo "1a76e08ba1f7296a9916c96c33a08f3aa150d3ad559bb50983fa72bd4d16cba0  app/src/main/assets/www/static/app.js" | sha256sum -c -
+          echo "9298129f1f9fe0b59bb6719a1e1cd726966f659c007171dee25b84596b96beab  app/src/main/assets/www/static/app.js" | sha256sum -c -
           echo "657c94723c51d43680bbb5ae6e3a87c37b9e9a8fe2ab573e93ea6bddf61da3c3  app/src/main/assets/www/static/local-api.js" | sha256sum -c -
           node --check app/src/main/assets/www/static/app.js
           node --check app/src/main/assets/www/static/local-api.js
@@ -67,7 +67,7 @@ jobs:
           node --check app/src/main/assets/www/static/resizable-columns.js
           node --check app/src/main/assets/www/static/assessment-colors.js
           grep -q 'id="manualScore"' app/src/main/assets/www/static/app.js
-          grep -q "step=\"0.01\"" app/src/main/assets/www/static/app.js
+          grep -q 'step="0.01"' app/src/main/assets/www/static/app.js
           grep -q 'Corrección numérica sin rúbrica' app/src/main/assets/www/static/app.js
 
       - name: Build debug APK
@@ -84,20 +84,20 @@ jobs:
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$APK" | tee apk-signature.txt
           "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$APK" | tee apk-badging.txt
           grep -q "package: name='es.aulaevidencia.personal.stable'" apk-badging.txt
-          grep -q "versionName='1.2.8-personal'" apk-badging.txt
+          grep -q "versionName='1.2.9-personal'" apk-badging.txt
           grep -q "sdkVersion:'26'" apk-badging.txt
           grep -q "Verified using v2 scheme (APK Signature Scheme v2): true" apk-signature.txt
 
       - name: Prepare APK artifact
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk AulaEvidencia-Personal-1.2.8-estable.apk
-          sha256sum AulaEvidencia-Personal-1.2.8-estable.apk > AulaEvidencia-Personal-1.2.8-estable.apk.sha256
+          cp app/build/outputs/apk/debug/app-debug.apk AulaEvidencia-Personal-1.2.9-estable.apk
+          sha256sum AulaEvidencia-Personal-1.2.9-estable.apk > AulaEvidencia-Personal-1.2.9-estable.apk.sha256
 
       - name: Upload diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: AulaEvidencia-build-diagnostics-1.2.8
+          name: AulaEvidencia-build-diagnostics-1.2.9
           path: |
             gradle-build.log
             apk-signature.txt
@@ -108,8 +108,8 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: AulaEvidencia-Personal-APK-1.2.8
+          name: AulaEvidencia-Personal-APK-1.2.9
           path: |
-            AulaEvidencia-Personal-1.2.8-estable.apk
-            AulaEvidencia-Personal-1.2.8-estable.apk.sha256
+            AulaEvidencia-Personal-1.2.9-estable.apk
+            AulaEvidencia-Personal-1.2.9-estable.apk.sha256
           if-no-files-found: error
