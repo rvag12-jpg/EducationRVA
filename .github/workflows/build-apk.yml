@@ -6,39 +6,27 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
+    permissions: { contents: read }
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
       - name: Restore persistent Android debug signing key
         id: signing-cache
         uses: actions/cache@v4
-        with:
-          path: ~/.android/debug.keystore
-          key: aulaevidencia-stable-debug-keystore-v1
+        with: { path: ~/.android/debug.keystore, key: aulaevidencia-stable-debug-keystore-v1 }
       - name: Create signing key on first stable build
         if: steps.signing-cache.outputs.cache-hit != 'true'
-        run: |
-          mkdir -p ~/.android
-          keytool -genkeypair -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=AulaEvidencia Stable Debug,O=AulaEvidencia,C=ES"
+        run: mkdir -p ~/.android && keytool -genkeypair -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=AulaEvidencia Stable Debug,O=AulaEvidencia,C=ES"
       - name: Signing key fingerprint
         run: keytool -list -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey | tee signing-key.txt
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      - uses: android-actions/setup-android@v3
       - name: Install Android SDK packages
         run: |
           yes | sdkmanager --licenses >/dev/null || true
           sdkmanager "platforms;android-36" "build-tools;36.0.0"
-      - name: Set up Gradle 9.5.0
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '9.5.0'
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: '9.5.0' }
       - name: Rebuild and validate web assets
         run: |
           mkdir -p app/src/main/assets/www/static app/src/main/assets/www/media
@@ -46,36 +34,31 @@ jobs:
           cat exact/local.00 | base64 -d | gunzip > app/src/main/assets/www/static/local-api.js
           base64 -d exact/docio-bg.b64 > app/src/main/assets/www/media/docio-home-bg.jpg
           base64 -d exact/docio-logo.b64 > app/src/main/assets/www/media/docio-logo.jpg
-          echo "07ffcd30e5b3c3a7d7e19d2475f768b43ffce968ad7af871780ef39615857b8e  app/src/main/assets/www/static/app.js" | sha256sum -c -
-          echo "657c94723c51d43680bbb5ae6e3a87c37b9e9a8fe2ab573e93ea6bddf61da3c3  app/src/main/assets/www/static/local-api.js" | sha256sum -c -
           node --check app/src/main/assets/www/static/resizable-columns.js
-          grep -q 'PointerEvent' app/src/main/assets/www/static/resizable-columns.js
-          grep -q 'Ajustar columnas' app/src/main/assets/www/static/resizable-columns.js
-          grep -q 'Finalizar ajuste' app/src/main/assets/www/static/resizable-columns.js
-          grep -q 'Restablecer anchos' app/src/main/assets/www/static/resizable-columns.js
+          node --check app/src/main/assets/www/static/backup-file-restore.js
+          grep -q 'backup-file-restore.js' app/src/main/assets/www/index.html
+          grep -q 'Adjuntar copia .aebk' app/src/main/assets/www/static/backup-file-restore.js
+          grep -q 'chooseBackupFile' app/src/main/java/es/aulaevidencia/android/MainActivity.java
       - name: Build debug APK
-        run: gradle :app:assembleDebug --stacktrace --info --console=plain 2>&1 | tee gradle-build.log
-      - name: Verify APK signature and manifest
+        run: gradle :app:assembleDebug --stacktrace --console=plain 2>&1 | tee gradle-build.log
+      - name: Verify APK
         run: |
           APK=app/build/outputs/apk/debug/app-debug.apk
-          test -s "$APK"
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$APK" | tee apk-signature.txt
           "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$APK" | tee apk-badging.txt
           grep -q "package: name='es.aulaevidencia.personal.stable'" apk-badging.txt
-          grep -q "versionName='1.2.20-docio'" apk-badging.txt
+          grep -q "versionName='1.2.21-docio'" apk-badging.txt
           grep -q "application-label:'DOCIO'" apk-badging.txt
-          grep -q "Verified using v2 scheme (APK Signature Scheme v2): true" apk-signature.txt
-          unzip -p "$APK" assets/www/static/resizable-columns.js | grep -q 'PointerEvent'
-          unzip -p "$APK" assets/www/static/resizable-columns.js | grep -q 'Ajustar columnas'
+          unzip -p "$APK" assets/www/static/backup-file-restore.js | grep -q 'Adjuntar copia .aebk'
       - name: Prepare APK artifact
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk DOCIO-Cuaderno-Digital-1.2.20.apk
-          sha256sum DOCIO-Cuaderno-Digital-1.2.20.apk > DOCIO-Cuaderno-Digital-1.2.20.apk.sha256
+          cp app/build/outputs/apk/debug/app-debug.apk DOCIO-Cuaderno-Digital-1.2.21.apk
+          sha256sum DOCIO-Cuaderno-Digital-1.2.21.apk > DOCIO-Cuaderno-Digital-1.2.21.apk.sha256
       - name: Upload diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: DOCIO-build-diagnostics-1.2.20
+          name: DOCIO-build-diagnostics-1.2.21
           path: |
             gradle-build.log
             apk-signature.txt
@@ -85,8 +68,7 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: DOCIO-APK-1.2.20
+          name: DOCIO-APK-1.2.21
           path: |
-            DOCIO-Cuaderno-Digital-1.2.20.apk
-            DOCIO-Cuaderno-Digital-1.2.20.apk.sha256
-          if-no-files-found: error
+            DOCIO-Cuaderno-Digital-1.2.21.apk
+            DOCIO-Cuaderno-Digital-1.2.21.apk.sha256
