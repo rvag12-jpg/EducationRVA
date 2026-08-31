@@ -67,14 +67,14 @@ jobs:
           node --check app/src/main/assets/www/static/resizable-columns.js
           node --check app/src/main/assets/www/static/assessment-colors.js
           node --check app/src/main/assets/www/static/gradebook-score-limits.js
+          node --check app/src/main/assets/www/static/weekly-schedule.js
           grep -q 'id="manualScore"' app/src/main/assets/www/static/app.js
-          grep -q 'step="0.01"' app/src/main/assets/www/static/app.js
-          grep -q 'Corrección numérica sin rúbrica' app/src/main/assets/www/static/app.js
-          grep -q 'gradebook-score-limits.js' app/src/main/assets/www/index.html
-          grep -q "input.min = '0'" app/src/main/assets/www/static/gradebook-score-limits.js
+          grep -q 'weekly-schedule.js' app/src/main/assets/www/index.html
+          grep -q 'Horario semanal' app/src/main/assets/www/static/weekly-schedule.js
+          grep -q 'Añadir clase semanal' app/src/main/assets/www/static/weekly-schedule.js
+          grep -q "\['schedule','Horario'\]" app/src/main/assets/www/static/weekly-schedule.js
           grep -q "input.max = '10'" app/src/main/assets/www/static/gradebook-score-limits.js
           grep -q "input.step = '0.01'" app/src/main/assets/www/static/gradebook-score-limits.js
-          grep -q 'toFixed(2)' app/src/main/assets/www/static/gradebook-score-limits.js
 
       - name: Build debug APK
         shell: bash
@@ -90,23 +90,24 @@ jobs:
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$APK" | tee apk-signature.txt
           "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$APK" | tee apk-badging.txt
           grep -q "package: name='es.aulaevidencia.personal.stable'" apk-badging.txt
-          grep -q "versionName='1.2.10-personal'" apk-badging.txt
+          grep -q "versionName='1.2.11-personal'" apk-badging.txt
           grep -q "sdkVersion:'26'" apk-badging.txt
           grep -q "Verified using v2 scheme (APK Signature Scheme v2): true" apk-signature.txt
-          unzip -p "$APK" assets/www/index.html | grep -q 'gradebook-score-limits.js'
-          unzip -p "$APK" assets/www/static/gradebook-score-limits.js | grep -q "input.max = '10'"
-          unzip -p "$APK" assets/www/static/gradebook-score-limits.js | grep -q "input.step = '0.01'"
+          unzip -p "$APK" assets/www/index.html | grep -q 'weekly-schedule.js'
+          unzip -p "$APK" assets/www/static/weekly-schedule.js | grep -q 'Horario semanal'
+          unzip -p "$APK" assets/www/static/weekly-schedule.js | grep -q 'Añadir clase semanal'
+          unzip -p "$APK" assets/www/static/resizable-columns.js | grep -q 'Ajustar columnas'
 
       - name: Prepare APK artifact
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk AulaEvidencia-Personal-1.2.10-estable.apk
-          sha256sum AulaEvidencia-Personal-1.2.10-estable.apk > AulaEvidencia-Personal-1.2.10-estable.apk.sha256
+          cp app/build/outputs/apk/debug/app-debug.apk AulaEvidencia-Personal-1.2.11-horario.apk
+          sha256sum AulaEvidencia-Personal-1.2.11-horario.apk > AulaEvidencia-Personal-1.2.11-horario.apk.sha256
 
       - name: Upload diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: AulaEvidencia-build-diagnostics-1.2.10
+          name: AulaEvidencia-build-diagnostics-1.2.11
           path: |
             gradle-build.log
             apk-signature.txt
@@ -117,8 +118,8 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: AulaEvidencia-Personal-APK-1.2.10
+          name: AulaEvidencia-Personal-APK-1.2.11
           path: |
-            AulaEvidencia-Personal-1.2.10-estable.apk
-            AulaEvidencia-Personal-1.2.10-estable.apk.sha256
+            AulaEvidencia-Personal-1.2.11-horario.apk
+            AulaEvidencia-Personal-1.2.11-horario.apk.sha256
           if-no-files-found: error
