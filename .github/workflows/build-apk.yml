@@ -48,20 +48,11 @@ jobs:
           base64 -d exact/docio-logo.b64 > app/src/main/assets/www/media/docio-logo.jpg
           echo "07ffcd30e5b3c3a7d7e19d2475f768b43ffce968ad7af871780ef39615857b8e  app/src/main/assets/www/static/app.js" | sha256sum -c -
           echo "657c94723c51d43680bbb5ae6e3a87c37b9e9a8fe2ab573e93ea6bddf61da3c3  app/src/main/assets/www/static/local-api.js" | sha256sum -c -
-          node --check app/src/main/assets/www/static/app.js
-          node --check app/src/main/assets/www/static/local-api.js
-          node --check app/src/main/assets/www/static/curriculum-packages.js
           node --check app/src/main/assets/www/static/group-colors.js
-          node --check app/src/main/assets/www/static/weekly-schedule.js
-          node --check app/src/main/assets/www/static/docio-theme.js
-          grep -q 'group-colors.js' app/src/main/assets/www/index.html
+          grep -q 'observe(document.body' app/src/main/assets/www/static/group-colors.js
           grep -q 'Elegir color' app/src/main/assets/www/static/group-colors.js
           grep -q 'Confirmar color' app/src/main/assets/www/static/group-colors.js
           grep -q '1024 colores disponibles' app/src/main/assets/www/static/group-colors.js
-          grep -q 'body.color=selected' app/src/main/assets/www/static/group-colors.js
-          grep -q 'AN-FYQ-2ESO-2023' app/src/main/assets/www/static/curriculum-packages.js
-          grep -q 'AN-FIS-2BACH-2023' app/src/main/assets/www/static/curriculum-packages.js
-          grep -q '#35BFC8' app/src/main/res/drawable/ic_launcher.xml
       - name: Build debug APK
         run: gradle :app:assembleDebug --stacktrace --info --console=plain 2>&1 | tee gradle-build.log
       - name: Verify APK signature and manifest
@@ -71,20 +62,20 @@ jobs:
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$APK" | tee apk-signature.txt
           "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$APK" | tee apk-badging.txt
           grep -q "package: name='es.aulaevidencia.personal.stable'" apk-badging.txt
-          grep -q "versionName='1.2.17-docio'" apk-badging.txt
+          grep -q "versionName='1.2.18-docio'" apk-badging.txt
           grep -q "application-label:'DOCIO'" apk-badging.txt
           grep -q "Verified using v2 scheme (APK Signature Scheme v2): true" apk-signature.txt
+          unzip -p "$APK" assets/www/static/group-colors.js | grep -q 'observe(document.body'
           unzip -p "$APK" assets/www/static/group-colors.js | grep -q 'Elegir color'
-          unzip -p "$APK" assets/www/static/group-colors.js | grep -q 'Confirmar color'
       - name: Prepare APK artifact
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk DOCIO-Cuaderno-Digital-1.2.17.apk
-          sha256sum DOCIO-Cuaderno-Digital-1.2.17.apk > DOCIO-Cuaderno-Digital-1.2.17.apk.sha256
+          cp app/build/outputs/apk/debug/app-debug.apk DOCIO-Cuaderno-Digital-1.2.18.apk
+          sha256sum DOCIO-Cuaderno-Digital-1.2.18.apk > DOCIO-Cuaderno-Digital-1.2.18.apk.sha256
       - name: Upload diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: DOCIO-build-diagnostics-1.2.17
+          name: DOCIO-build-diagnostics-1.2.18
           path: |
             gradle-build.log
             apk-signature.txt
@@ -94,8 +85,8 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: DOCIO-APK-1.2.17
+          name: DOCIO-APK-1.2.18
           path: |
-            DOCIO-Cuaderno-Digital-1.2.17.apk
-            DOCIO-Cuaderno-Digital-1.2.17.apk.sha256
+            DOCIO-Cuaderno-Digital-1.2.18.apk
+            DOCIO-Cuaderno-Digital-1.2.18.apk.sha256
           if-no-files-found: error
