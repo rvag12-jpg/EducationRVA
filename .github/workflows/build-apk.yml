@@ -37,8 +37,8 @@ jobs:
           node --check app/src/main/assets/www/static/correction-import.js
           node --check app/src/main/assets/www/static/student-click-edit.js
           grep -q 'student-click-edit.js' app/src/main/assets/www/index.html
-          grep -q 'docio-edit-student' app/src/main/assets/www/static/student-click-edit.js
-          grep -q 'DOCIO_CORRECTION_V1' app/src/main/assets/www/static/correction-import.js
+          grep -q 'Editar alumno' app/src/main/assets/www/static/student-click-edit.js
+          grep -q 'removeLegacyButtons' app/src/main/assets/www/static/correction-import.js
       - name: Build debug APK
         run: gradle :app:assembleDebug --stacktrace --console=plain 2>&1 | tee gradle-build.log
       - name: Verify APK and signer
@@ -47,19 +47,20 @@ jobs:
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$APK" | tee apk-signature.txt
           "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$APK" | tee apk-badging.txt
           grep -q "package: name='es.aulaevidencia.personal.stable'" apk-badging.txt
-          grep -q "versionName='1.2.29-docio'" apk-badging.txt
+          grep -q "versionName='1.2.30-docio'" apk-badging.txt
           grep -q "application-label:'DOCIO'" apk-badging.txt
           grep -q 'Signer #1 certificate SHA-256 digest: e33e997d020d3577852cfb06495e8f018fa8792fa1c86f1fd7935c941a1e31c3' apk-signature.txt
-          unzip -p "$APK" assets/www/static/student-click-edit.js | grep -q 'docio-edit-student'
+          unzip -p "$APK" assets/www/static/student-click-edit.js | grep -q 'Editar alumno'
+          unzip -p "$APK" assets/www/static/correction-import.js | grep -q 'removeLegacyButtons'
       - name: Prepare APK artifact
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk DOCIO-Cuaderno-Digital-1.2.29.apk
-          sha256sum DOCIO-Cuaderno-Digital-1.2.29.apk > DOCIO-Cuaderno-Digital-1.2.29.apk.sha256
+          cp app/build/outputs/apk/debug/app-debug.apk DOCIO-Cuaderno-Digital-1.2.30.apk
+          sha256sum DOCIO-Cuaderno-Digital-1.2.30.apk > DOCIO-Cuaderno-Digital-1.2.30.apk.sha256
       - name: Upload diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: DOCIO-build-diagnostics-1.2.29
+          name: DOCIO-build-diagnostics-1.2.30
           path: |
             gradle-build.log
             apk-signature.txt
@@ -69,7 +70,7 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: DOCIO-APK-1.2.29
+          name: DOCIO-APK-1.2.30
           path: |
-            DOCIO-Cuaderno-Digital-1.2.29.apk
-            DOCIO-Cuaderno-Digital-1.2.29.apk.sha256
+            DOCIO-Cuaderno-Digital-1.2.30.apk
+            DOCIO-Cuaderno-Digital-1.2.30.apk.sha256
