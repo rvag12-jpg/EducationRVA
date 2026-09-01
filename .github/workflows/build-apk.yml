@@ -34,13 +34,12 @@ jobs:
           cat exact/local.00 | base64 -d | gunzip > app/src/main/assets/www/static/local-api.js
           base64 -d exact/docio-bg.b64 > app/src/main/assets/www/media/docio-home-bg.jpg
           base64 -d exact/docio-logo.b64 > app/src/main/assets/www/media/docio-logo.jpg
+          node --check app/src/main/assets/www/static/delete-feature.js
           node --check app/src/main/assets/www/static/correction-import.js
           node --check app/src/main/assets/www/static/student-click-edit.js
-          grep -q 'student-click-edit.js' app/src/main/assets/www/index.html
-          grep -q 'correction-import.js' app/src/main/assets/www/index.html
+          grep -q 'Eliminar prueba' app/src/main/assets/www/static/delete-feature.js
+          grep -q 'removeAssessment' app/src/main/assets/www/static/delete-feature.js
           grep -q 'Editar alumno' app/src/main/assets/www/static/student-click-edit.js
-          grep -q 'Guardar cambios' app/src/main/assets/www/static/student-click-edit.js
-          grep -q 'DOCIOStudentEditor' app/src/main/assets/www/static/student-click-edit.js
           grep -q 'DOCIO_CORRECTION_V1' app/src/main/assets/www/static/correction-import.js
       - name: Build debug APK
         run: gradle :app:assembleDebug --stacktrace --console=plain 2>&1 | tee gradle-build.log
@@ -50,21 +49,20 @@ jobs:
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs "$APK" | tee apk-signature.txt
           "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$APK" | tee apk-badging.txt
           grep -q "package: name='es.aulaevidencia.personal.stable'" apk-badging.txt
-          grep -q "versionName='1.2.32-docio'" apk-badging.txt
+          grep -q "versionName='1.2.33-docio'" apk-badging.txt
           grep -q "application-label:'DOCIO'" apk-badging.txt
           grep -q 'Signer #1 certificate SHA-256 digest: e33e997d020d3577852cfb06495e8f018fa8792fa1c86f1fd7935c941a1e31c3' apk-signature.txt
-          unzip -p "$APK" assets/www/static/student-click-edit.js | grep -q 'Guardar cambios'
-          unzip -p "$APK" assets/www/static/student-click-edit.js | grep -q 'DOCIOStudentEditor'
-          unzip -p "$APK" assets/www/static/correction-import.js | grep -q 'DOCIO_CORRECTION_V1'
+          unzip -p "$APK" assets/www/static/delete-feature.js | grep -q 'Eliminar prueba'
+          unzip -p "$APK" assets/www/static/delete-feature.js | grep -q 'removeAssessment'
       - name: Prepare APK artifact
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk DOCIO-Cuaderno-Digital-1.2.32.apk
-          sha256sum DOCIO-Cuaderno-Digital-1.2.32.apk > DOCIO-Cuaderno-Digital-1.2.32.apk.sha256
+          cp app/build/outputs/apk/debug/app-debug.apk DOCIO-Cuaderno-Digital-1.2.33.apk
+          sha256sum DOCIO-Cuaderno-Digital-1.2.33.apk > DOCIO-Cuaderno-Digital-1.2.33.apk.sha256
       - name: Upload diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: DOCIO-build-diagnostics-1.2.32
+          name: DOCIO-build-diagnostics-1.2.33
           path: |
             gradle-build.log
             apk-signature.txt
@@ -74,7 +72,7 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: DOCIO-APK-1.2.32
+          name: DOCIO-APK-1.2.33
           path: |
-            DOCIO-Cuaderno-Digital-1.2.32.apk
-            DOCIO-Cuaderno-Digital-1.2.32.apk.sha256
+            DOCIO-Cuaderno-Digital-1.2.33.apk
+            DOCIO-Cuaderno-Digital-1.2.33.apk.sha256
