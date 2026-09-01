@@ -37,7 +37,7 @@ jobs:
           node --check app/src/main/assets/www/static/correction-import.js
           node --check app/src/main/assets/www/static/student-click-edit.js
           grep -q 'student-click-edit.js' app/src/main/assets/www/index.html
-          grep -q 'Editar alumno' app/src/main/assets/www/static/student-click-edit.js
+          grep -q 'Pulsar para editar alumno' app/src/main/assets/www/static/student-click-edit.js
           grep -q 'removeLegacyButtons' app/src/main/assets/www/static/correction-import.js
       - name: Build debug APK
         run: gradle :app:assembleDebug --stacktrace --console=plain 2>&1 | tee gradle-build.log
@@ -50,7 +50,7 @@ jobs:
           grep -q "versionName='1.2.30-docio'" apk-badging.txt
           grep -q "application-label:'DOCIO'" apk-badging.txt
           grep -q 'Signer #1 certificate SHA-256 digest: e33e997d020d3577852cfb06495e8f018fa8792fa1c86f1fd7935c941a1e31c3' apk-signature.txt
-          unzip -p "$APK" assets/www/static/student-click-edit.js | grep -q 'Editar alumno'
+          unzip -p "$APK" assets/www/static/student-click-edit.js | grep -q 'Pulsar para editar alumno'
           unzip -p "$APK" assets/www/static/correction-import.js | grep -q 'removeLegacyButtons'
       - name: Prepare APK artifact
         run: |
