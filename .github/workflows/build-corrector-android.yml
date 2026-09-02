@@ -1,0 +1,58 @@
+name: Build Corrector Quimica Android
+
+on:
+  push:
+    branches:
+      - chatgpt/corrector-quimica-android-v1
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Configure Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+
+      - name: Install Android SDK 35
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Compile APK debug
+        working-directory: CorrectorQuimicaAndroid
+        run: gradle :app:assembleDebug --stacktrace
+
+      - name: Copy APK and checksum
+        run: |
+          mkdir -p build-output
+          cp CorrectorQuimicaAndroid/app/build/outputs/apk/debug/app-debug.apk build-output/CorrectorQuimica_2Bach_Android.apk
+          sha256sum build-output/CorrectorQuimica_2Bach_Android.apk > build-output/CorrectorQuimica_2Bach_Android.apk.sha256
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CorrectorQuimica-Android-APK
+          path: build-output/CorrectorQuimica_2Bach_Android.apk
+          if-no-files-found: error
+
+      - name: Commit compiled APK to isolated branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add build-output/CorrectorQuimica_2Bach_Android.apk build-output/CorrectorQuimica_2Bach_Android.apk.sha256
+          git commit -m "Build Android APK [skip ci]"
+          git push origin HEAD:${GITHUB_REF_NAME}
