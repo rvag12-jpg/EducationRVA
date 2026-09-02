@@ -1,0 +1,48 @@
+TABLA AUXILIAR SABERES ↔ CRITERIOS · SOLO APOYO
+
+Esta tabla procede del material auxiliar aportado por el profesor. No sobrescribe la fuente curricular prioritaria y no obliga a seleccionar un criterio cuando la evidencia de la cuestión no lo justifica.
+
+QUIM.2.A.1.1 → 5.1, 6.1
+QUIM.2.A.1.2 → 6.1
+QUIM.2.A.2.1 → 5.2
+QUIM.2.A.2.2 → 5.4
+QUIM.2.A.2.3 → 5.4
+QUIM.2.A.3.1 → 1.2, 1.3
+QUIM.2.A.3.2 → 1.3
+QUIM.2.A.3.3 → 1.3
+QUIM.2.A.3.4 → 3.1
+QUIM.2.A.4.1 → 4.1
+QUIM.2.A.4.2 → 5.4
+QUIM.2.A.4.3 → 1.3
+QUIM.2.A.4.4 → 2.3
+QUIM.2.A.4.5 → 6.2
+QUIM.2.B.1.1 → 6.1
+QUIM.2.B.1.2 → 6.3
+QUIM.2.B.1.3 → 6.3
+QUIM.2.B.1.4 → 6.1
+QUIM.2.B.1.5 → 6.1
+QUIM.2.B.2.1 → 2.3
+QUIM.2.B.2.2 → 2.1
+QUIM.2.B.2.3 → 1.3
+QUIM.2.B.3.1 → 6.3
+QUIM.2.B.3.2 → 3.2
+QUIM.2.B.3.3 → 1.3
+QUIM.2.B.4.1 → 4.1
+QUIM.2.B.4.2 → 4.1
+QUIM.2.B.4.3 → 6.2
+QUIM.2.B.4.4 → 1.2
+QUIM.2.B.4.5 → 1.1, 3.3
+QUIM.2.B.4.6 → 1.1
+QUIM.2.B.5.1 → 1.2
+QUIM.2.B.5.2 → 3.2
+QUIM.2.B.5.3 → 2.3, 3.1
+QUIM.2.B.5.4 → 2.3
+QUIM.2.B.5.5 → 2.2
+QUIM.2.C.1.1 → 3.1
+QUIM.2.C.1.2 → 5.4
+QUIM.2.C.2.1 → 4.2
+QUIM.2.C.2.2 → 4.3
+QUIM.2.C.3.1 → 3.3
+QUIM.2.C.3.2 → 5.3
+
+Si una asociación auxiliar parece incompleta, extraña o no pertinente para la evidencia realmente evaluada, usa la definición literal del criterio y el contenido de la cuestión para decidir; no inventes conciliaciones.
