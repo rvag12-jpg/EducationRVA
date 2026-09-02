@@ -1,0 +1,67 @@
+CRITERIOS DE EVALUACIÓN · QUÍMICA 2.º BACHILLERATO · FUENTE PRIORITARIA APORTADA POR EL PROFESOR
+
+Usa solo códigos de esta lista cuando sean realmente pertinentes. Máximo recomendado: dos criterios principales por cuestión.
+
+1.1 Reconocer la importancia de la Química y sus conexiones con otras áreas en el desarrollo de la sociedad, el progreso de la ciencia, la tecnología, la economía y el desarrollo sostenible respetuoso con el medioambiente, identificando avances fundamentales de la Química.
+1.2 Describir los principales procesos químicos que suceden en el entorno y las propiedades de los sistemas materiales a partir de los conocimientos, destrezas y actitudes propios de las distintas disciplinas de la Química.
+1.3 Reconocer la naturaleza experimental e interdisciplinar de la Química y su influencia en la investigación científica y en los ámbitos económico y laboral, considerando hechos empíricos y aplicaciones.
+2.1 Relacionar los principios de la Química con problemas de actualidad asociados al desarrollo de la ciencia y la tecnología, analizando su comunicación o su observación cotidiana.
+2.2 Reconocer y comunicar que las bases de la Química constituyen un cuerpo de conocimiento imprescindible para estudiar y discutir cuestiones significativas en ámbitos social, económico, político y ético.
+2.3 Aplicar de manera informada, coherente y razonada los modelos y leyes de la Química, explicando y prediciendo consecuencias de experimentos, fenómenos naturales, procesos industriales y descubrimientos científicos.
+3.1 Utilizar correctamente las normas de nomenclatura IUPAC como base de un lenguaje universal para la Química, aplicándolas al reconocimiento y escritura de fórmulas y nombres de especies químicas.
+3.2 Emplear con rigor herramientas matemáticas para apoyar el pensamiento científico en Química, aplicándolas en la resolución de problemas mediante ecuaciones, unidades y operaciones.
+3.3 Practicar y hacer respetar normas de seguridad relacionadas con la manipulación de sustancias químicas y la gestión/eliminación de residuos, utilizando correctamente códigos de comunicación de la Química.
+4.1 Analizar la composición química de sistemas materiales del entorno natural, industrial y tecnológico, mostrando que sus propiedades, aplicaciones y beneficios se basan en principios de la Química.
+4.2 Argumentar de manera informada, aplicando teorías y leyes de la Química, sobre efectos negativos de determinadas sustancias en ambiente y salud y su relación con mal uso o negligencia.
+4.3 Explicar, empleando conocimientos científicos adecuados, beneficios de productos de la tecnología química y su contribución al progreso social.
+5.1 Reconocer la contribución del trabajo colaborativo entre especialistas de distintas disciplinas científicas y las conexiones entre leyes y teorías.
+5.2 Reconocer la aportación de la Química al desarrollo del pensamiento científico y de la autonomía de pensamiento crítico mediante metodologías propias de las disciplinas científicas.
+5.3 Resolver problemas relacionados con la Química y estudiar situaciones de esta ciencia, reconociendo contribuciones particulares, diversidad de pensamiento y habilidades sociales positivas en equipos.
+5.4 Representar y visualizar de forma eficiente conceptos de Química de especial dificultad usando herramientas digitales y recursos variados, incluidas experiencias de laboratorio real y virtual.
+6.1 Explicar y razonar conceptos fundamentales de la Química aplicando conceptos, leyes y teorías de otras disciplinas científicas, especialmente Física, mediante experimentación e indagación.
+6.2 Deducir ideas fundamentales de otras disciplinas científicas por medio de la relación entre sus contenidos básicos y las leyes y teorías propias de la Química.
+6.3 Solucionar problemas y cuestiones característicos de la Química utilizando herramientas matemáticas y tecnológicas, relacionando fenómenos experimentales y naturales con conceptos propios de la disciplina.
+
+SABERES BÁSICOS DISPONIBLES
+QUIM.2.A.1.1 Radiación electromagnética y espectros atómicos; emisión de hidrógeno.
+QUIM.2.A.1.2 Interpretación de espectros de emisión/absorción y estructura electrónica.
+QUIM.2.A.2.1 Planck, cuantización, modelo de Bohr, energía de órbitas, aciertos/limitaciones.
+QUIM.2.A.2.2 Incertidumbre, dualidad onda-corpúsculo y modelo mecánico-cuántico.
+QUIM.2.A.2.3 Números cuánticos, Pauli, Hund, Aufbau y configuraciones electrónicas.
+QUIM.2.A.3.1 Origen experimental de tabla periódica y teoría atómica.
+QUIM.2.A.3.2 Posición de un elemento desde configuración electrónica.
+QUIM.2.A.3.3 Propiedades periódicas: radios, ionización, afinidad, electronegatividad.
+QUIM.2.A.3.4 Formulación y nomenclatura de compuestos inorgánicos.
+QUIM.2.A.4.1 Tipos de enlace, energía de formación y propiedades.
+QUIM.2.A.4.2 Covalente, Lewis, RPECV, hibridación, geometría y polaridad.
+QUIM.2.A.4.3 Iónico y ciclo de Born-Haber.
+QUIM.2.A.4.4 Metálico, nube electrónica y teoría de bandas.
+QUIM.2.A.4.5 Fuerzas intermoleculares y propiedades macroscópicas.
+QUIM.2.B.1.1 Primer principio: calor, trabajo e intercambio de energía.
+QUIM.2.B.1.2 Ecuaciones termoquímicas, entalpía, endotermicidad/exotermicidad.
+QUIM.2.B.1.3 Hess, entalpías de formación y energías de enlace.
+QUIM.2.B.1.4 Segundo principio, entropía, espontaneidad e irreversibilidad.
+QUIM.2.B.1.5 Gibbs y espontaneidad frente a temperatura.
+QUIM.2.B.2.1 Colisiones, velocidad y energía de activación.
+QUIM.2.B.2.2 Influencia de condiciones sobre velocidad.
+QUIM.2.B.2.3 Ley diferencial de velocidad y órdenes desde datos.
+QUIM.2.B.3.1 Reversibilidad, equilibrio dinámico y constante.
+QUIM.2.B.3.2 Kc, Kp y producto de solubilidad en equilibrios heterogéneos.
+QUIM.2.B.3.3 Le Châtelier, cociente de reacción y evolución del equilibrio.
+QUIM.2.B.4.1 Arrhenius y Brønsted-Lowry.
+QUIM.2.B.4.2 Ácidos/bases fuertes y débiles; grado de disociación.
+QUIM.2.B.4.3 pH, Ka y Kb.
+QUIM.2.B.4.4 Pares conjugados e hidrólisis de sales.
+QUIM.2.B.4.5 Neutralización y volumetrías ácido-base.
+QUIM.2.B.4.6 Ácidos/bases de relevancia industrial, consumo y medioambiente.
+QUIM.2.B.5.1 Estado de oxidación, oxidación y reducción.
+QUIM.2.B.5.2 Ion-electrón, estequiometría y volumetrías redox.
+QUIM.2.B.5.3 Potencial estándar y espontaneidad redox/electroquímica.
+QUIM.2.B.5.4 Faraday y cálculos en cubas electrolíticas.
+QUIM.2.B.5.5 Baterías, celdas, pilas de combustible y corrosión.
+QUIM.2.C.1.1 Fórmulas orgánicas e isomería estructural.
+QUIM.2.C.1.2 Representación 3D e isomería espacial.
+QUIM.2.C.2.1 Propiedades químicas de funciones orgánicas.
+QUIM.2.C.2.2 Principales tipos de reacciones orgánicas.
+QUIM.2.C.3.1 Formación de polímeros: monómeros, estructura y propiedades.
+QUIM.2.C.3.2 Clasificación, aplicaciones, propiedades y riesgos medioambientales de polímeros.
