@@ -1,0 +1,1 @@
+Final autonomous Android build trigger after API client, Keystore, curriculum assets and structured-output schemas are present.
