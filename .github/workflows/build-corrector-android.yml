@@ -1,9 +1,9 @@
-name: Build Corrector Quimica Android
+name: Build Corrector Quimica Android Autonomo
 
 on:
   push:
     branches:
-      - chatgpt/corrector-quimica-android-v1
+      - chatgpt/corrector-quimica-android-autonoma-v2
 
 permissions:
   contents: write
@@ -32,27 +32,31 @@ jobs:
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-35" "build-tools;35.0.0"
 
-      - name: Compile APK debug
+      - name: Prepare autonomous Android source
+        working-directory: CorrectorQuimicaAndroid
+        run: python3 autonomous_patch.py
+
+      - name: Compile autonomous APK debug
         working-directory: CorrectorQuimicaAndroid
         run: gradle :app:assembleDebug --stacktrace
 
       - name: Copy APK and checksum
         run: |
-          mkdir -p build-output
-          cp CorrectorQuimicaAndroid/app/build/outputs/apk/debug/app-debug.apk build-output/CorrectorQuimica_2Bach_Android.apk
-          sha256sum build-output/CorrectorQuimica_2Bach_Android.apk > build-output/CorrectorQuimica_2Bach_Android.apk.sha256
+          mkdir -p build-output-autonomous
+          cp CorrectorQuimicaAndroid/app/build/outputs/apk/debug/app-debug.apk build-output-autonomous/CorrectorQuimica_2Bach_Android_AUTONOMO.apk
+          sha256sum build-output-autonomous/CorrectorQuimica_2Bach_Android_AUTONOMO.apk > build-output-autonomous/CorrectorQuimica_2Bach_Android_AUTONOMO.apk.sha256
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: CorrectorQuimica-Android-APK
-          path: build-output/CorrectorQuimica_2Bach_Android.apk
+          name: CorrectorQuimica-Android-AUTONOMO-APK
+          path: build-output-autonomous/CorrectorQuimica_2Bach_Android_AUTONOMO.apk
           if-no-files-found: error
 
       - name: Commit compiled APK to isolated branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add build-output/CorrectorQuimica_2Bach_Android.apk build-output/CorrectorQuimica_2Bach_Android.apk.sha256
-          git commit -m "Build Android APK [skip ci]"
+          git add build-output-autonomous/CorrectorQuimica_2Bach_Android_AUTONOMO.apk build-output-autonomous/CorrectorQuimica_2Bach_Android_AUTONOMO.apk.sha256
+          git commit -m "Build autonomous Android APK [skip ci]"
           git push origin HEAD:${GITHUB_REF_NAME}
