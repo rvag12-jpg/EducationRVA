@@ -1,14 +1,9 @@
 from pathlib import Path
-import importlib.util
-import json
-import shutil
 
 ROOT = Path(__file__).resolve().parent
 MAIN = ROOT / "app/src/main/java/es/iesvirgendelacaridad/corrector/MainActivity.java"
 MANIFEST = ROOT / "app/src/main/AndroidManifest.xml"
 GRADLE = ROOT / "app/build.gradle"
-ASSETS = ROOT / "app/src/main/assets"
-BACKEND = ROOT / "backend"
 
 s = MAIN.read_text(encoding="utf-8")
 
@@ -23,7 +18,7 @@ rep('prefs = getSharedPreferences("corrector_quimica_v1", MODE_PRIVATE);\n      
     'prefs = getSharedPreferences("corrector_quimica_autonoma_v2", MODE_PRIVATE);\n        secureKeyStore = new SecureKeyStore(this);\n        ApiClient.init(this);\n        buildUi();')
 
 rep('root.addView(section("1 · Servidor corrector seguro"));', 'root.addView(section("1 · OpenAI API · modo autónomo"));')
-rep('root.addView(note("La clave de OpenAI NO se introduce en Android. El teléfono se conecta a un servidor corrector que guarda la clave fuera del APK. Para uso en la misma red Wi-Fi, introduce la URL LAN del ordenador, por ejemplo http://192.168.1.25:8765."));',
+rep('root.addView(note("La clave de OpenAI NO se introduce en Android. El teléfono se conecta a un servidor corrector que guarda la clave fuera del APK. Para uso en la misma red Wi‑Fi, introduce la URL LAN del ordenador, por ejemplo http://192.168.1.25:8765."));',
     'root.addView(note("No necesita ordenador ni servidor. Introduce una clave personal de OpenAI API. Al usarla, se cifra con AES/GCM mediante una clave no exportable del Android Keystore. No se incorpora al APK ni se guarda en texto plano. Los PDF/imágenes se envían directamente a OpenAI por HTTPS para poder corregirlos."));')
 rep('backendUrl = edit("URL del servidor", "http://192.168.1.25:8765"); root.addView(backendUrl);',
     'backendUrl = edit("Modelo OpenAI", "gpt-5.6-sol"); root.addView(backendUrl);')
@@ -66,15 +61,5 @@ MANIFEST.write_text(m, encoding="utf-8")
 g = GRADLE.read_text(encoding="utf-8")
 g = g.replace('versionCode 1', 'versionCode 2').replace("versionName '1.0.0'", "versionName '2.0.0-autonoma'")
 GRADLE.write_text(g, encoding="utf-8")
-
-ASSETS.mkdir(parents=True, exist_ok=True)
-for name in ['prompt_corrector.txt', 'quimica_2bach_context.txt', 'criterios_quimica_2bach.txt', 'saberes_criterios_aux.txt']:
-    shutil.copy2(BACKEND / name, ASSETS / name)
-
-spec = importlib.util.spec_from_file_location('corrector_backend_schema', BACKEND / 'server.py')
-mod = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(mod)
-(ASSETS / 'fmc_schema.json').write_text(json.dumps(mod.FMC_SCHEMA, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
-(ASSETS / 'grade_schema.json').write_text(json.dumps(mod.GRADE_SCHEMA, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
 
 print('Android autonomous patch applied')
