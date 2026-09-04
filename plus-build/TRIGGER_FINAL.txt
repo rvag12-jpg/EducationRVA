@@ -1,0 +1,1 @@
+Final compact Plus build after all MainActivity chunks.
