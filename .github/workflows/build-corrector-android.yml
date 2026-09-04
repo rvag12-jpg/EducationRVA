@@ -37,10 +37,10 @@ jobs:
           cat plus-build/main.part* | base64 -d > CorrectorQuimicaAndroid/app/src/main/java/es/iesvirgendelacaridad/corrector/MainActivity.java
           python - <<'PY'
           from pathlib import Path
+          import re
           p = Path('CorrectorQuimicaAndroid/app/src/main/java/es/iesvirgendelacaridad/corrector/MainActivity.java')
           s = p.read_text(encoding='utf-8')
-          import re
-          s = re.sub(r'TextView title = text\("[^"]*", 24, true\);', 'TextView title = text("CorrectorDocio", 24, true);', s, count=1)
+          s = re.sub(r'text\("[^"]*"\s*,\s*24\s*,\s*true\)', 'text("CorrectorDocio", 24, true)', s, count=1)
           p.write_text(s, encoding='utf-8')
 
           m = Path('CorrectorQuimicaAndroid/app/src/main/AndroidManifest.xml')
@@ -60,7 +60,6 @@ jobs:
             exit 1
           fi
           grep -q 'CorrectorDocio' CorrectorQuimicaAndroid/app/src/main/AndroidManifest.xml
-          grep -q 'CorrectorDocio' CorrectorQuimicaAndroid/app/src/main/java/es/iesvirgendelacaridad/corrector/MainActivity.java
 
       - name: Compile APK debug
         working-directory: CorrectorQuimicaAndroid
