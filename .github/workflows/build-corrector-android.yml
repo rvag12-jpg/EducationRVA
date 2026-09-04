@@ -34,22 +34,8 @@ jobs:
 
       - name: Apply ChatGPT Plus Android overlay
         run: |
-          cat plus-build/overlay.part* | base64 -d > /tmp/plus-overlay.zip
+          cat plus-build/v2.part* | base64 -d > /tmp/plus-overlay.zip
           unzip -o /tmp/plus-overlay.zip -d .
-          mkdir -p CorrectorQuimicaAndroid/app/src/main/assets
-          cp CorrectorQuimicaAndroid/backend/prompt_corrector.txt CorrectorQuimicaAndroid/app/src/main/assets/
-          cp CorrectorQuimicaAndroid/backend/quimica_2bach_context.txt CorrectorQuimicaAndroid/app/src/main/assets/
-          cp CorrectorQuimicaAndroid/backend/criterios_quimica_2bach.txt CorrectorQuimicaAndroid/app/src/main/assets/
-          cp CorrectorQuimicaAndroid/backend/saberes_criterios_aux.txt CorrectorQuimicaAndroid/app/src/main/assets/
-          python3 - <<'PY'
-          import importlib.util, json
-          path='CorrectorQuimicaAndroid/backend/server.py'
-          spec=importlib.util.spec_from_file_location('srv',path)
-          m=importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
-          out='CorrectorQuimicaAndroid/app/src/main/assets'
-          open(out+'/fmc_schema.json','w',encoding='utf-8').write(json.dumps(m.FMC_SCHEMA,ensure_ascii=False,separators=(',',':')))
-          open(out+'/grade_schema.json','w',encoding='utf-8').write(json.dumps(m.GRADE_SCHEMA,ensure_ascii=False,separators=(',',':')))
-          PY
           if grep -R "HttpURLConnection\|api.openai.com\|OPENAI_API_KEY" CorrectorQuimicaAndroid/app/src/main; then
             echo "Error: el cliente Android todavía contiene acceso API directo" >&2
             exit 1
