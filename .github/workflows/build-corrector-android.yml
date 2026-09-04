@@ -1,9 +1,9 @@
-name: Build Corrector Quimica Android
+name: Build Corrector Quimica ChatGPT Plus
 
 on:
   push:
     branches:
-      - chatgpt/corrector-quimica-android-v1
+      - chatgpt/corrector-quimica-plus-v3
 
 permissions:
   contents: write
@@ -32,27 +32,54 @@ jobs:
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-35" "build-tools;35.0.0"
 
+      - name: Apply ChatGPT Plus Android overlay
+        run: |
+          cat plus-build/overlay.part* | base64 -d > /tmp/plus-overlay.zip
+          unzip -o /tmp/plus-overlay.zip -d .
+          mkdir -p CorrectorQuimicaAndroid/app/src/main/assets
+          cp CorrectorQuimicaAndroid/backend/prompt_corrector.txt CorrectorQuimicaAndroid/app/src/main/assets/
+          cp CorrectorQuimicaAndroid/backend/quimica_2bach_context.txt CorrectorQuimicaAndroid/app/src/main/assets/
+          cp CorrectorQuimicaAndroid/backend/criterios_quimica_2bach.txt CorrectorQuimicaAndroid/app/src/main/assets/
+          cp CorrectorQuimicaAndroid/backend/saberes_criterios_aux.txt CorrectorQuimicaAndroid/app/src/main/assets/
+          python3 - <<'PY'
+          import importlib.util, json
+          path='CorrectorQuimicaAndroid/backend/server.py'
+          spec=importlib.util.spec_from_file_location('srv',path)
+          m=importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+          out='CorrectorQuimicaAndroid/app/src/main/assets'
+          open(out+'/fmc_schema.json','w',encoding='utf-8').write(json.dumps(m.FMC_SCHEMA,ensure_ascii=False,separators=(',',':')))
+          open(out+'/grade_schema.json','w',encoding='utf-8').write(json.dumps(m.GRADE_SCHEMA,ensure_ascii=False,separators=(',',':')))
+          PY
+          if grep -R "HttpURLConnection\|api.openai.com\|OPENAI_API_KEY" CorrectorQuimicaAndroid/app/src/main; then
+            echo "Error: el cliente Android todavía contiene acceso API directo" >&2
+            exit 1
+          fi
+          if grep -q 'uses-permission.*INTERNET' CorrectorQuimicaAndroid/app/src/main/AndroidManifest.xml; then
+            echo "Error: el APK Plus no debe pedir permiso INTERNET" >&2
+            exit 1
+          fi
+
       - name: Compile APK debug
         working-directory: CorrectorQuimicaAndroid
         run: gradle :app:assembleDebug --stacktrace
 
       - name: Copy APK and checksum
         run: |
-          mkdir -p build-output
-          cp CorrectorQuimicaAndroid/app/build/outputs/apk/debug/app-debug.apk build-output/CorrectorQuimica_2Bach_Android.apk
-          sha256sum build-output/CorrectorQuimica_2Bach_Android.apk > build-output/CorrectorQuimica_2Bach_Android.apk.sha256
+          mkdir -p build-output-plus
+          cp CorrectorQuimicaAndroid/app/build/outputs/apk/debug/app-debug.apk build-output-plus/CorrectorQuimica_2Bach_ChatGPT_PLUS.apk
+          sha256sum build-output-plus/CorrectorQuimica_2Bach_ChatGPT_PLUS.apk > build-output-plus/CorrectorQuimica_2Bach_ChatGPT_PLUS.apk.sha256
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: CorrectorQuimica-Android-APK
-          path: build-output/CorrectorQuimica_2Bach_Android.apk
+          name: CorrectorQuimica-ChatGPT-PLUS-APK
+          path: build-output-plus/CorrectorQuimica_2Bach_ChatGPT_PLUS.apk
           if-no-files-found: error
 
-      - name: Commit compiled APK to isolated branch
+      - name: Commit compiled APK
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add build-output/CorrectorQuimica_2Bach_Android.apk build-output/CorrectorQuimica_2Bach_Android.apk.sha256
-          git commit -m "Build Android APK [skip ci]"
+          git add build-output-plus/CorrectorQuimica_2Bach_ChatGPT_PLUS.apk build-output-plus/CorrectorQuimica_2Bach_ChatGPT_PLUS.apk.sha256
+          git commit -m "Build ChatGPT Plus Android APK [skip ci]" || exit 0
           git push origin HEAD:${GITHUB_REF_NAME}
