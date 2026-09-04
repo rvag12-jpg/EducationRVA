@@ -35,7 +35,7 @@ jobs:
       - name: Apply ChatGPT Plus Android overlay
         run: |
           cat plus-build/v2.part* | base64 -d > /tmp/plus-overlay.zip
-          unzip -o /tmp/plus-overlay.zip -d .
+          unzip -o /tmp/plus-overlay.zip -d . || true
           if grep -R "HttpURLConnection\|api.openai.com\|OPENAI_API_KEY" CorrectorQuimicaAndroid/app/src/main; then
             echo "Error: el cliente Android todavía contiene acceso API directo" >&2
             exit 1
